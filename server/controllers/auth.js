@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 //register user
+
 export const register = async (req, res) => {
     try {
         const {username, password} = req.body //получаем тело запроса имя пол. и пароль
@@ -23,10 +24,19 @@ export const register = async (req, res) => {
             password: hash,
         })
 
+        const token = jwt.sign(
+            {
+            id: newUser._id, //айди пользователя в базе данных
+            }, 
+            process.env.JWT_SECRET,
+            {expiresIn: '30d'},
+        )
+
         await newUser.save() //сохраняем пользователя в базе данных
 
         res.json({ //отправляем ответ на фронтэнд об успехе регистрации
             newUser,
+            token,
             message: "Регистрация прошла успешно",
         })
 
